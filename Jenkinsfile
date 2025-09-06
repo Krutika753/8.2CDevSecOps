@@ -1,8 +1,8 @@
 pipeline {
   agent any
   environment {
-    'PATH+NODE' = '/usr/local/opt/node@18/bin'     // quiets PATH warnings on your Mac Jenkins
-    SONAR_TOKEN = credentials('SONAR_TOKEN')       // <-- uses the Jenkins credential you created
+    'PATH+NODE' = '/usr/local/opt/node@18/bin'     
+    SONAR_TOKEN = credentials('SONAR_TOKEN')       
   }
 
   stages {
