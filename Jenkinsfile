@@ -2,42 +2,57 @@ pipeline {
   agent any
   options { timestamps() }
 
-  // Token comes from Jenkins credentials (ID: SONAR_TOKEN)
+ 
   environment {
-    SONAR_TOKEN = credentials('SONAR_TOKEN')
+    PATH = "/usr/local/opt/node@18/bin:/usr/local/bin:/usr/bin:/bin:${PATH}"
   }
 
   stages {
+
     stage('Checkout') {
       steps {
-        git branch: 'main', url: 'https://github.com/Krutika753/8.2CDevSecOps.git'
+       
+        checkout scm
       }
     }
 
     stage('Install Dependencies') {
-      steps { sh 'npm install' }
+      steps {
+        sh 'npm install'
+      }
     }
 
     stage('Run Tests') {
-      steps { sh 'npm test || true' }
+      steps {
+       
+        sh 'npm test || true'
+      }
     }
 
     stage('Generate Coverage Report') {
-      steps { sh 'npm run coverage || true' }
+      steps {
+        
+        sh '[ -f package.json ] && (npm run coverage || true) || true'
+      }
     }
 
     stage('NPM Audit (Security Scan)') {
-      steps { sh 'npm audit || true' }
+      steps {
+        sh 'npm audit || true'
+      }
     }
 
     stage('SonarCloud Analysis') {
-  steps {
-    withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
-      sh '''
-        /usr/local/bin/sonar-scanner \
-          -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.token="$SONAR_TOKEN"
-      '''
+      steps {
+        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+          sh '''
+            /usr/local/bin/sonar-scanner \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.token="$SONAR_TOKEN"
+          '''
+        }
+      }
     }
-  }
+
+  } 
 }
