@@ -1,8 +1,10 @@
 pipeline {
   agent any
+  options { timestamps() }
+
+  // Token comes from Jenkins credentials (ID: SONAR_TOKEN)
   environment {
-    'PATH+NODE' = '/usr/local/opt/node@18/bin'     
-    SONAR_TOKEN = credentials('SONAR_TOKEN')       
+    SONAR_TOKEN = credentials('SONAR_TOKEN')
   }
 
   stages {
@@ -17,11 +19,11 @@ pipeline {
     }
 
     stage('Run Tests') {
-      steps { sh 'npm test || true' }              // continue even if tests fail
+      steps { sh 'npm test || true' }
     }
 
     stage('Generate Coverage Report') {
-      steps { sh 'npm run coverage || true' }      // ok if no coverage script exists
+      steps { sh 'npm run coverage || true' }
     }
 
     stage('NPM Audit (Security Scan)') {
@@ -34,9 +36,8 @@ pipeline {
           set -e
           VER=5.0.1.3006
           case "$(uname -s)" in
-            Darwin) SUFFIX="macosx" ;;             # your Jenkins host is macOS
-            Linux)  SUFFIX="linux"  ;;
-            *) echo "Unsupported OS"; exit 1 ;;
+            Darwin) SUFFIX="macosx" ;;   # macOS Jenkins host
+            *)      SUFFIX="linux"  ;;
           esac
 
           rm -rf .scanner
@@ -46,7 +47,7 @@ pipeline {
           unzip -qo .scanner/sonar.zip -d .scanner
           SCAN_BIN="$(echo .scanner/sonar-scanner-*/bin/sonar-scanner)"
 
-          # Run scanner; token comes from Jenkins credentials
+          # Use the injected credential
           "$SCAN_BIN" -Dsonar.token="$SONAR_TOKEN"
         '''
       }
