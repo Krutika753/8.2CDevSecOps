@@ -213,3 +213,4 @@ snyk wizard
 In this application, the default `snyk wizard` answers will fix all the issues.
 When the wizard is done, restart the application and run the exploits again to confirm they are fixed.
 # trigger Sun  7 Sep 2025 09:48:47 AEST
+# audit trigger Sun  7 Sep 2025 09:55:57 AEST
