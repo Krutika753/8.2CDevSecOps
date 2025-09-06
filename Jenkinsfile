@@ -31,26 +31,13 @@ pipeline {
     }
 
     stage('SonarCloud Analysis') {
-      steps {
-        sh '''
-          set -e
-          VER=5.0.1.3006
-          case "$(uname -s)" in
-            Darwin) SUFFIX="macosx" ;;   # macOS Jenkins host
-            *)      SUFFIX="linux"  ;;
-          esac
-
-          rm -rf .scanner
-          mkdir -p .scanner
-          curl -fsSL -o .scanner/sonar.zip \
-            "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-${VER}-${SUFFIX}.zip"
-          unzip -qo .scanner/sonar.zip -d .scanner
-          SCAN_BIN="$(echo .scanner/sonar-scanner-*/bin/sonar-scanner)"
-
-          # Use the injected credential
-          "$SCAN_BIN" -Dsonar.token="$SONAR_TOKEN"
-        '''
-      }
+  steps {
+    withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+      sh '''
+        /usr/local/bin/sonar-scanner \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.token="$SONAR_TOKEN"
+      '''
     }
   }
 }
